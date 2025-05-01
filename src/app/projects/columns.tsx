@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import ReportProject from "./report-project";
-import ViewProjects from "./view-projects";
+import ViewProjects from "./view-project";
 
 export const columns: ColumnDef<Project>[] = [
   {

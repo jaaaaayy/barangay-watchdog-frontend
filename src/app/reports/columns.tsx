@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
+import ViewReport from "./view-report";
 
 export const columns: ColumnDef<Report>[] = [
   {
@@ -37,7 +38,7 @@ export const columns: ColumnDef<Report>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const id = row.original.id;
+      const report = row.original;
 
       return (
         <DropdownMenu>
@@ -50,8 +51,7 @@ export const columns: ColumnDef<Report>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View report</DropdownMenuItem>
-            {/* < id={id} /> */}
+            <ViewReport report={report} />
           </DropdownMenuContent>
         </DropdownMenu>
       );

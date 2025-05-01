@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -49,6 +50,7 @@ const reportFormSchema = z.object({
 export type ReportFormSchema = z.infer<typeof reportFormSchema>;
 
 const ReportProject = ({ id }: { id: number }) => {
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const { mutateAsync: reportMutation } = useMutation({
@@ -65,7 +67,7 @@ const ReportProject = ({ id }: { id: number }) => {
         },
       });
 
-      // router.push("/reports");
+      router.push("/reports");
     },
     onError: (error) => {
       console.log("error", error);
