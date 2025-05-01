@@ -52,7 +52,7 @@ export const columns: ColumnDef<Project>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const payment = row.original;
+      const id = row.original.id;
 
       return (
         <DropdownMenu>
@@ -66,7 +66,7 @@ export const columns: ColumnDef<Project>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View project</DropdownMenuItem>
-            <ReportProject />
+            <ReportProject id={id} />
           </DropdownMenuContent>
         </DropdownMenu>
       );

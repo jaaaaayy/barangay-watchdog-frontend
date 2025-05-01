@@ -1,10 +1,10 @@
 "use client";
 
-import getAllProjects from "@/action";
 import { DataTable } from "@/components/ui/data-table";
 import { useQuery } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
 import { columns } from "./columns";
+import { getAllProjects } from "@/action";
 
 const ProjectList = () => {
   const {
