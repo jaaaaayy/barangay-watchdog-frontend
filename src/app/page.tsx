@@ -1,4 +1,6 @@
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const Home = () => {
   return (
@@ -12,9 +14,15 @@ const Home = () => {
         Help improve your barangay by reporting local issues, corruption, or
         misconduct while keeping your identity completely anonymous and secure.
       </p>
-      <Button size="lg" variant="destructive" className="text-base">
+      <Link
+        href="/projects"
+        className={cn(
+          buttonVariants({ variant: "destructive", size: "lg" }),
+          "text-base"
+        )}
+      >
         Report Anonymously
-      </Button>
+      </Link>
     </div>
   );
 };
