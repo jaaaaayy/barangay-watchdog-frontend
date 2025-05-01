@@ -33,20 +33,12 @@ const Header = () => {
           ))}
         </div>
       </div>
-      <div className="space-x-2">
-        <Link
-          href="/reports/create"
-          className={cn(buttonVariants({ variant: "outline" }))}
-        >
-          Create report
-        </Link>
-        <Link
-          href="/login"
-          className={cn(buttonVariants({ variant: "default" }))}
-        >
-          Login
-        </Link>
-      </div>
+      <Link
+        href="/login"
+        className={cn(buttonVariants({ variant: "default" }))}
+      >
+        Login
+      </Link>
     </header>
   );
 };
