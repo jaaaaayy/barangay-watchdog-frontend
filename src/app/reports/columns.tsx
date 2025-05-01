@@ -1,6 +1,6 @@
 "use client";
 
-import { Project } from "@/types";
+import { Project, Report } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
@@ -12,10 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import ReportProject from "./report-project";
-import ViewProjects from "./view-projects";
 
-export const columns: ColumnDef<Project>[] = [
+export const columns: ColumnDef<Report>[] = [
   {
     accessorKey: "title",
     header: "Title",
@@ -27,41 +25,19 @@ export const columns: ColumnDef<Project>[] = [
     cell: ({ getValue }) => <p>{getValue<string>()}</p>,
   },
   {
-    accessorKey: "budget",
-    header: "Budget",
+    accessorKey: "type",
+    header: "Type",
     cell: ({ getValue }) => <p>{getValue<string>()}</p>,
   },
   {
-    accessorKey: "creator",
-    header: "Creator",
-    cell: ({ row }) => {
-      const creator = row.original.creator;
-
-      return (
-        <p>
-          {`${creator.last_name} ${creator.first_name}, ${creator.middle_name}`}
-        </p>
-      );
-    },
-  },
-  {
-    accessorKey: "start_date",
-    header: "Start Date",
-    cell: ({ getValue }) => (
-      <p>{new Date(getValue<string>()).toLocaleString()}</p>
-    ),
-  },
-  {
-    accessorKey: "end_date",
-    header: "End Date",
-    cell: ({ getValue }) => (
-      <p>{new Date(getValue<string>()).toLocaleString()}</p>
-    ),
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ getValue }) => <p>{getValue<string>()}</p>,
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const project = row.original;
+      const id = row.original.id;
 
       return (
         <DropdownMenu>
@@ -74,8 +50,8 @@ export const columns: ColumnDef<Project>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <ViewProjects project={project} />
-            <ReportProject id={project.id} />
+            <DropdownMenuItem>View report</DropdownMenuItem>
+            {/* < id={id} /> */}
           </DropdownMenuContent>
         </DropdownMenu>
       );
