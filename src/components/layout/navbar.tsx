@@ -53,6 +53,9 @@ export function Navbar() {
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4">
+          <Link href="/create-report">
+            <Button variant="outline">Create report</Button>
+          </Link>
           <Link href="/login">
             <Button>Login</Button>
           </Link>
