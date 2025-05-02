@@ -54,33 +54,43 @@ const formSchema = z.object({
 export function ReportForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  // previews for image thumbnails
+  const [previews, setPreviews] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { title: "", description: "", location: "", date: new Date(), evidence: [] },
+    defaultValues: { title: "", description: "", category: "", location: "", date: new Date(), evidence: [] },
   });
 
-  const { setValue, getValues } = form;
-
-  // Refs to hidden inputs for tapping
+  const { setValue, getValues, watch, reset } = form;
   const photoRef = useRef<HTMLInputElement>(null);
   const docRef = useRef<HTMLInputElement>(null);
 
   function handleFiles(files: FileList | null) {
     if (!files) return;
-    const newFiles = Array.from(files).map((file) => file.name);
-    setValue("evidence", [...(getValues("evidence") || []), ...newFiles], { shouldValidate: true, shouldDirty: true });
+    const fileArray = Array.from(files);
+    // store names
+    const names = fileArray.map((f) => f.name);
+    const current = getValues("evidence") || [];
+    setValue("evidence", [...current, ...names], { shouldValidate: true, shouldDirty: true });
+    // generate previews for images only
+    const imagePreviews = fileArray
+      .filter((f) => f.type.startsWith("image/"))
+      .map((f) => URL.createObjectURL(f));
+    setPreviews((prev) => [...prev, ...imagePreviews]);
   }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((r) => setTimeout(r, 2000));
     console.log(values);
     setIsSubmitting(false);
     setIsSuccess(true);
-    // Reset form after 3 seconds
-    setTimeout(() => { form.reset(); setIsSuccess(false); }, 3000);
+    setTimeout(() => {
+      reset({ title: "", description: "", category: "", location: "", date: new Date(), evidence: [] });
+      setPreviews([]);
+      setIsSuccess(false);
+    }, 3000);
   }
 
   if (isSuccess) {
@@ -97,6 +107,8 @@ export function ReportForm() {
       </div>
     );
   }
+
+  const evidenceList = watch("evidence") || [];
 
   return (
     <Form {...form}>
@@ -124,7 +136,10 @@ export function ReportForm() {
                 <SelectContent>
                   {REPORT_CATEGORIES.map(cat => (
                     <SelectItem key={cat.value} value={cat.value}>
-                      <div className="flex flex-col"><span>{cat.label}</span><span className="text-xs text-muted-foreground">{cat.description}</span></div>
+                      <div className="flex flex-col">
+                        <span>{cat.label}</span>
+                        <span className="text-xs text-muted-foreground">{cat.description}</span>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -136,7 +151,7 @@ export function ReportForm() {
           <FormField control={form.control} name="description" render={({ field }) => (
             <FormItem>
               <FormLabel>Detailed Description</FormLabel>
-              <FormControl><Textarea className="min-h-[120px]" placeholder="Provide a detailed description of the issue including what happened, who was involved, and any other relevant details." {...field} /></FormControl>
+              <FormControl><Textarea className="min-h-[120px]" placeholder="Provide a detailed description..." {...field} /></FormControl>
               <div className="flex items-center justify-between">
                 <FormDescription>Be specific and include all relevant details.</FormDescription>
                 <p className="text-xs text-muted-foreground">{field.value.length}/1000 characters</p>
@@ -156,7 +171,7 @@ export function ReportForm() {
           <FormField control={form.control} name="location" render={({ field }) => (
             <FormItem>
               <FormLabel className="flex items-center gap-2">Location<TooltipProvider><Tooltip><TooltipTrigger asChild><Info className="h-4 w-4 text-muted-foreground" /></TooltipTrigger><TooltipContent className="max-w-xs"><p>Include barangay name, street, landmarks, etc.</p></TooltipContent></Tooltip></TooltipProvider></FormLabel>
-              <FormControl><div className="relative"><MapPin className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" /><Input className="pl-8" placeholder="Barangay, Street, Building, etc." {...field} /></div></FormControl>
+              <FormControl><div className="relative"><MapPin className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" /><Input className="pl-8" placeholder="Barangay, Street..." {...field} /></div></FormControl>
               <FormMessage />
             </FormItem>
           )} />
@@ -175,31 +190,51 @@ export function ReportForm() {
 
         {/* Evidence */}
         <div className="space-y-4">
-          <div><h2 className="text-lg font-medium">Evidence (Optional)</h2><p className="text-sm text-muted-foreground">You can upload photos or documents as evidence.</p></div>
+          <div><h2 className="text-lg font-medium">Evidence (Optional)</h2><p className="text-sm text-muted-foreground">Upload photos or documents as evidence.</p></div>
           <Separator />
-          <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center">
+          <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center text-center">
             <Upload className="h-8 w-8 text-muted-foreground mb-2" />
             <p className="text-sm font-medium">Drag & drop files here</p>
-            <p className="text-xs text-muted-foreground mt-1 mb-4">or tap buttons below (max 5MB each)</p>
+            <p className="text-xs text-muted-foreground mb-4">or tap buttons below (max 5MB each)</p>
             <div className="flex flex-col sm:flex-row gap-2">
               <input ref={photoRef} type="file" accept="image/*" multiple hidden onChange={e => handleFiles(e.target.files)} />
               <Button variant="outline" size="sm" onClick={() => photoRef.current?.click()} className="flex items-center"><Upload className="h-4 w-4 mr-2" />Upload Photo</Button>
               <input ref={docRef} type="file" accept=".pdf,.doc,.docx" multiple hidden onChange={e => handleFiles(e.target.files)} />
               <Button variant="outline" size="sm" onClick={() => docRef.current?.click()} className="flex items-center"><Upload className="h-4 w-4 mr-2" />Upload Document</Button>
             </div>
-            <p className="text-xs text-muted-foreground mt-4 max-w-md">Note: All uploaded files are automatically stripped of metadata to protect your identity.</p>
-          </div>
-        </div>
-
-        {/* Privacy Notice */}
-        <div className="rounded-lg border p-4 bg-muted/20">
-          <div className="flex items-start gap-4">
-            <div className="bg-yellow-100 rounded-full p-2 text-yellow-600"><Info className="h-5 w-5" /></div>
-            <div><h3 className="font-medium">Privacy Notice</h3><p className="text-sm text-muted-foreground mt-1">All reports are anonymous. We do not collect IP addresses, device information, or any personally identifiable information. Any metadata from uploaded files is automatically removed.</p></div>
+            {/* thumbnail grid */}
+            {previews.length > 0 && (
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                {previews.map((src, idx) => (
+                  <img key={idx} src={src} alt={`preview-${idx}`} className="h-20 w-20 object-cover rounded-lg" />
+                ))}
+              </div>
+            )}
+            {evidenceList.length > 0 && (
+              <ul className="mt-2 text-xs text-left w-full max-w-md text-muted-foreground">
+                {evidenceList.map((name, i) => <li key={i} className="truncate">{name}</li>)}
+              </ul>
+            )}
+            <p className="text-xs text-muted-foreground mt-4 max-w-md">Note: metadata is stripped automatically.</p>
           </div>
         </div>
 
         {/* Submit */}
+        {/* Privacy Notice */}
+        <div className="rounded-lg border p-4 bg-muted/20">
+          <div className="flex items-start gap-4">
+            <div className="bg-yellow-100 rounded-full p-2 text-yellow-600">
+              <Info className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="font-medium">Privacy Notice</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                All reports are anonymous. We do not collect IP addresses, device information, or any personally identifiable information. Any metadata from uploaded files is automatically removed.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="flex justify-end">
           <Button type="submit" size="lg" disabled={isSubmitting} className="bg-red-600 hover:bg-red-700">
             {isSubmitting ? (<><svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>Submitting Report...</>) : "Submit Anonymous Report"}
