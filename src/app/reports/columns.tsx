@@ -23,7 +23,9 @@ export const columns: ColumnDef<Report>[] = [
   {
     accessorKey: "description",
     header: "Description",
-    cell: ({ getValue }) => <p>{getValue<string>()}</p>,
+    cell: ({ getValue }) => (
+      <p className="whitespace-pre-wrap break-words">{getValue<string>()}</p>
+    ),
   },
   {
     accessorKey: "type",

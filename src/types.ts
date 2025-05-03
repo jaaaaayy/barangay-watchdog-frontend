@@ -61,3 +61,11 @@ export type User = {
   email: string;
   password: string;
 };
+
+export type AuditLog = {
+  type: string;
+  description: string;
+  entity_type: string;
+  entity_id: number;
+  user_id: number;
+};

@@ -24,26 +24,28 @@ export const columns: ColumnDef<Project>[] = [
   {
     accessorKey: "description",
     header: "Description",
-    cell: ({ getValue }) => <p>{getValue<string>()}</p>,
+    cell: ({ getValue }) => (
+      <p className="whitespace-pre-wrap break-words">{getValue<string>()}</p>
+    ),
   },
   {
     accessorKey: "budget",
     header: "Budget",
     cell: ({ getValue }) => <p>{getValue<string>()}</p>,
   },
-  {
-    accessorKey: "creator",
-    header: "Creator",
-    cell: ({ row }) => {
-      const creator = row.original.creator;
+  // {
+  //   accessorKey: "creator",
+  //   header: "Creator",
+  //   cell: ({ row }) => {
+  //     const creator = row.original.creator;
 
-      return (
-        <p>
-          {`${creator.last_name} ${creator.first_name}, ${creator.middle_name}`}
-        </p>
-      );
-    },
-  },
+  //     return (
+  //       <p>
+  //         {`${creator.last_name} ${creator.first_name}, ${creator.middle_name}`}
+  //       </p>
+  //     );
+  //   },
+  // },
   {
     accessorKey: "start_date",
     header: "Start Date",
